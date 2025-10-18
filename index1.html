@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400&display=swap" rel="stylesheet"> 
+    <title>ULTRAGON - Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; }
+        body { color: #e0e0e0; background-color: #000000; font-size: 14px; padding-bottom: 80px; }
+        
+        .header { display: flex; align-items: center; justify-content: space-between; padding: 15px; background-color: #191929; border-bottom: 1px solid #2a2a3a; }
+        .header-left, .header-right { display: flex; align-items: center; flex: 1; }
+        .header-left { justify-content: flex-start; }
+        .header-right { justify: flex-end; gap: 10px; }
+        .header-center { flex: 2; text-align: center; }
+        .header-title-img { height: 35px; width: auto; vertical-align: middle; }
+        .header-logo { height: 30px; width: auto; } 
+        .header-btn { background: none; border: none; cursor: pointer; padding: 5px; border-radius: 50%; }
+        /* Ikon jadi merah */
+        .header-btn img, .nav-item img, .icon-button img {
+            width: 24px; height: 24px;
+            filter: invert(30%) sepia(90%) saturate(2000%) hue-rotate(340deg) brightness(100%) contrast(100%);
+            transition: filter 0.3s;
+        }
+        .nav-item.active img {
+            filter: invert(30%) sepia(90%) saturate(2000%) hue-rotate(340deg) brightness(120%) contrast(100%);
+        }
+
+        main { padding: 20px 15px; }
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .content-box { background: rgba(25, 25, 41, 0.8); padding: 25px; border-radius: 15px; text-align: center; width: 100%; border: 1px solid #2a2a3a; }
+        .content-box h2 { margin-bottom: 20px; color: #88d3ce; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #000000; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #2a2a3a; z-index: 10; }
+        .nav-item { cursor: pointer; text-align: center; color: #ffffff; }
+        /* Teks Nav Item Default */
+        .nav-item span { 
+            font-size: 0.75em; 
+            display: block; 
+            color: #ffffff; /* Warna teks default */
+            filter: brightness(0.6); /* Sedikit redup */
+            transition: filter 0.3s, color 0.3s, font-weight 0.3s;
+        }
+        /* Teks Nav Item Aktif */
+        .nav-item.active span {
+            color: #ffffff; /* Warna teks putih */
+            filter: brightness(1); /* Terang */
+            font-weight: bold; /* Sedikit tebal */
+        }
+        
+        button, a, input, select, .nav-item, .header-btn, .icon-button { outline: none !important; box-shadow: none !important; -webkit-tap-highlight-color: transparent; }
+        .main-banner { position: relative; border-radius: 16px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+        .main-banner img { width: 100%; display: block; }
+        .banner-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
+        .banner-overlay h2 { font-size: 1.5em; color: #fff; }
+        .banner-overlay p { font-size: 0.9em; color: #aaa; }
+        
+        .icon-nav-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        
+        .icon-button { display: flex; flex-direction: column; align-items: center; gap: 8px; text-decoration: none; color: #ccc; }
+        .icon-button .icon-bg { width: 50px; height: 50px; background-color: #191929; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid #2a2a3a; transition: background-color 0.3s; }
+        .icon-button:hover .icon-bg { background-color: #2a2a3a; }
+        .icon-button span { font-size: 0.8em; }
+        
+        .input-group { text-align: left; margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; color: #a7a9be; }
+        .input-group input, .input-group select { width: 100%; padding: 12px; border: 1px solid #2a2a3a; background: #10101a; border-radius: 8px; color: #fff; font-size: 1em; }
+        .submit-btn { width: 100%; padding: 12px; border: none; border-radius: 8px; background: #88d3ce; color: #10101a; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .submit-btn img { width: 20px; height: 20px; }
+        .submit-btn:disabled { background-color: #555; cursor: not-allowed; }
+
+        /* --- STYLE BARU UNTUK TOMBOL MODE MODERN --- */
+        .mode-selector {
+            display: flex;
+            width: 100%;
+            background: #10101a;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #2a2a3a;
+            margin-bottom: 15px;
+        }
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background-color: transparent;
+            color: #a7a9be;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        .mode-btn.active {
+            background-color: #88d3ce;
+            color: #10101a;
+        }
+        /* --- AKHIR STYLE BARU --- */
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-box { background: #191929; padding: 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; border: 1px solid #2a2a3a; transform: scale(0.9); transition: transform 0.3s; }
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-box p { margin-bottom: 20px; color: #a7a9be; }
+        .modal-buttons { display: flex; gap: 10px; }
+        .modal-buttons button { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .profile-info { text-align: left; margin-bottom: 25px; }
+        .profile-info p { border-bottom: 1px solid #2a2a3a; padding: 10px 0; color: #fff; display: flex; justify-content: space-between; }
+        .profile-info p span { color: #aaa; }
+        .status-active { color: #2ecc71 !important; } .status-expired { color: #e74c3c !important; }
+        .account-data-table { width: 100%; border-collapse: collapse; margin-top: 20px; table-layout: fixed; }
+        .account-data-table th, .account-data-table td { padding: 8px; border: 1px solid #2a2a3a; text-align: left; font-size: 0.9em; word-wrap: break-word; }
+        .account-data-table th { background-color: #10101a; }
+        .online-status { display: inline-block; width: 10px; height: 10px; background-color: #e74c3c; border-radius: 50%; margin-right: 5px; }
+        .online-status.online { background-color: #2ecc71; }
+        .action-btn { border: none; padding: 5px 8px; border-radius: 5px; cursor: pointer; width: 100%; color: white; }
+        .delete-btn { background-color: #c0392b; }
+        .delete-btn:disabled { background-color: #555; cursor: not-allowed; }
+        .renew-account-btn { background-color: #3498db; }
+        .blocked-page, .frozen-overlay { width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center; text-align: center; flex-direction: column; position: fixed; top: 0; left: 0; }
+        .frozen-overlay { background: rgba(0,0,0,0.8); z-index: 99; }
+        #notification-container { position: fixed; top: 20px; right: 20px; z-index: 1000; }
+        .notification { padding: 15px; border-radius: 8px; color: #fff; font-weight: bold; background: #333; margin-bottom: 10px; animation: slideIn 0.5s forwards; }
+        .notification.success { background: #2ecc71; } .notification.error { background: #e74c3c; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+        .subscription-status { background: #10101a; border-radius: 8px; padding: 15px; margin-bottom: 20px; text-align: left; font-size: 0.9em; border: 1px solid #2a2a3a;}
+        .owner-controls { margin-top: 20px; border-top: 1px solid #2a2a3a; padding-top: 20px; }
+        .control-buttons { display: flex; gap: 10px; }
+        .control-buttons button { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .apk-on-btn { background-color: #2ecc71; color: white; }
+        .apk-off-btn { background-color: #e74c3c; color: white; }
+        .message-inbox { max-height: 400px; overflow-y: auto; text-align: left; }
+        .message-item { background: #10101a; border: 1px solid #2a2a3a; border-radius: 10px; padding: 15px; margin-bottom: 15px; }
+        .message-item p { margin-bottom: 10px; word-wrap: break-word; }
+        .message-item b { color: #88d3ce; }
+        .message-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .message-actions button { width: 100%; padding: 8px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .accept-btn { background-color: #27ae60; color: white; }
+        .telegram-btn { background-color: #3498db; color: white; }
+        .reject-btn { background-color: #c0392b; color: white; }
+        
+        .conversation-list-item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #2a2a3a; cursor: pointer; }
+        .conversation-list-item:hover { background-color: #10101a; }
+        .conversation-info { text-align: left; }
+        .conversation-info .username { font-weight: bold; color: #fff; }
+        .conversation-info .last-message { font-size: 0.9em; color: #aaa; }
+        #chat-window-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        #message-container { height: calc(100vh - 300px); overflow-y: auto; display: flex; flex-direction: column; padding: 10px; }
+        .message-bubble { max-width: 70%; padding: 10px 15px; border-radius: 18px; margin-bottom: 10px; word-wrap: break-word; }
+        .message-bubble .timestamp { font-size: 0.7em; color: #bbb; display: block; margin-top: 5px; text-align: right; }
+        .sent { background-color: #3498db; align-self: flex-end; }
+        .received { background-color: #2c3e50; align-self: flex-start; }
+        #message-form { display: flex; margin-top: 10px; gap: 10px; }
+        #message-input { flex-grow: 1; }
+        
+        #user-search-results { max-height: 200px; overflow-y: auto; margin-top: 15px; }
+        .search-result-item { padding: 12px; text-align: left; border-bottom: 1px solid #2a2a3a; cursor: pointer; }
+        .search-result-item:hover { background-color: #2a2a3a; }
+        .search-result-item:last-child { border-bottom: none; }
+
+        /* === CSS STATS PANEL - SUPER FINAL === */
+        .stats-panel {
+            width: 100%; 
+            background: linear-gradient(135deg, #a00000 0%, #700000 100%); 
+            border-radius: 12px;
+            padding: 0; 
+            margin-top: 20px;
+            border: 1px solid rgba(255, 100, 100, 0.2); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25); 
+            font-size: 14px; 
+            color: #ffffff; 
+            overflow: hidden; 
+        }
+        .stats-header {
+            display: flex;
+            align-items: center;
+            gap: 8px; 
+            padding: 15px; 
+            background-color: #b8860b; /* Latar header kuning kemerahan */
+            font-weight: bold;
+            border-bottom: 1px solid gold; /* Garis emas */ 
+        }
+        .stats-header span {
+            color: #ffffff; /* Teks header putih */
+        }
+        .stats-header img {
+            width: 20px; 
+            height: 20px;
+            display: block; 
+            filter: none; /* Ikon header putih */
+        }
+        .stats-content {
+            padding: 0 15px 5px 15px; 
+        }
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0; 
+        }
+        .stats-row + .stats-row {
+             border-top: 1px solid gold; /* Garis emas */ 
+        }
+        .stats-row .label {
+            display: flex;
+            align-items: center;
+            gap: 10px; 
+            color: #ffcccc; 
+        }
+        .stats-row .label img {
+            width: 20px; 
+            height: 20px;
+            display: block;
+            filter: none; 
+        }
+        .stats-row .value {
+            font-weight: normal; /* Font weight normal */
+            color: #ffffff; 
+            text-align: right;
+            font-family: 'Orbitron', 'Courier New', monospace; /* Font Digital */
+            font-size: 1em; /* Ukuran font normal */
+        }
+        
+        /* === CSS BANNER TELEGRAM KUSTOM - SUPER FINAL (Revisi lagi) === */
+        .telegram-custom-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; 
+            width: 100%; 
+            background: linear-gradient(135deg, #a00000 0%, #700000 100%); 
+            border-radius: 12px;
+            padding: 15px; 
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 100, 100, 0.2); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25); 
+            text-decoration: none; 
+            color: #ffffff; 
+            font-size: 14px; 
+            cursor: pointer;
+        }
+        .telegram-custom-banner .banner-content {
+            display: flex;
+            align-items: center;
+            gap: 10px; 
+            flex-grow: 1; 
+        }
+        .telegram-custom-banner .banner-icon-img {
+            width: 50px; /* Ukuran ikon orang diperbesar lagi */
+            height: 50px; /* Pastikan tinggi sama agar proporsional */
+            filter: invert(100%); 
+            flex-shrink: 0;
+            display: block;
+        }
+        
+        .telegram-custom-banner .banner-text {
+            flex-grow: 1; 
+            margin-right: 10px; 
+            font-weight: bold; 
+            line-height: 1.3; 
+            text-align: left; 
+            font-family: 'Orbitron', 'Courier New', monospace; /* FONT DIUBAH DI SINI */
+        }
+        .telegram-custom-banner .banner-text span {
+             display: block; 
+        }
+        .telegram-custom-banner .arrow-icon {
+            font-size: 1.5em; 
+            color: #ffffff;
+            flex-shrink: 0; 
+        }
+
+    </style>
+</head>
+<body>
+    <div id="app-wrapper">
+        <div id="notification-container"></div>
+        <div class="header">
+            <div class="header-left">
+                <button class="header-btn" id="hamburger-btn">
+                    <img src="tandatiga.png" alt="Menu">
+                </button>
+            </div>
+            <div class="header-center">
+                <img src="ultragon.png" alt="ULTRAGON" class="header-title-img">
+            </div>
+            <div class="header-right">
+                <img src="logoug.png" alt="Logo ULTRAGON" class="header-logo">
+                <button class="header-btn" id="profile-header-btn">
+                    <img src="profil.png" alt="Profile">
+                </button> 
+            </div>
+        </div>
+        <main>
+            <div id="home-page" class="page">
+                <div class="main-banner">
+                    <img src="saitama.png" alt="Saitama Banner">
+                    <div class="banner-overlay">
+                        <h2>ULTRAGON V1 PRO</h2>
+                        <p>Welcome, <span id="welcome-username">User</span>!</p>
+                    </div>
+                </div>
+                <div class="icon-nav-grid">
+                    <a href="#" class="icon-button" id="nav-admin-icon" style="display: none;">
+                        <div class="icon-bg"><img src="tambah.png" alt="Create Account"></div>
+                        <span>Create Account</span>
+                    </a>
+                    <a href="#" class="icon-button" id="nav-chat-icon">
+                        <div class="icon-bg"><img src="pesan.png" alt="Messages"></div>
+                        <span>Messages</span>
+                    </a>
+                    <a href="#" class="icon-button" id="nav-sender-icon">
+                        <div class="icon-bg"><img src="kumbang1.png" alt="Bug"></div>
+                        <span>Bug</span>
+                    </a>
+                    <a href="#" class="icon-button" id="nav-data-icon" style="display: none;">
+                        <div class="icon-bg"><img src="data.png" alt="Data"></div>
+                        <span>Data</span>
+                    </a>
+                    <a href="#" class="icon-button" id="nav-settings-icon">
+                        <div class="icon-bg"><img src="pengaturan.png" alt="Settings"></div>
+                        <span>Settings</span>
+                    </a>
+                </div>
+                
+                <a href="https://t.me/+ewRqxzWttLo3ZmU1" target="_blank" class="telegram-custom-banner">
+                    <div class="banner-content">
+                        <img src="orang.png" alt="People Icon" class="banner-icon-img">
+                        <span class="banner-text">
+                            <span>🔥 Telegram Channel: Join To Get</span> 
+                            <span>More Info!</span>
+                        </span>
+                    </div>
+                    <span class="arrow-icon">⟩</span>
+                </a>
+                
+                <div class="stats-panel">
+                    <div class="stats-header">
+                        <img src="stats-icon.png" alt=""> <span>Server Stats</span>
+                    </div>
+                    <div class="stats-content">
+                        <div class="stats-row">
+                            <span class="label">
+                                <img src="online-users-icon.png" alt=""> <span>Online Users</span>
+                            </span>
+                            <span class="value" id="online-users-stat">0</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="label">
+                                <img src="active-sender-icon.png" alt=""> <span>Active Sender</span>
+                            </span>
+                            <span class="value" id="active-sender-stat">0</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div id="data-page" class="page">
+                 <div class="content-box">
+                    <h2>Account Data Dashboard</h2>
+                    <div class="input-group">
+                        <input type="search" id="search-account-input" placeholder="Search username...">
+                    </div>
+                    <p>Total Accounts Created: <b id="total-accounts">0</b></p>
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        <table class="account-data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:15%">Status</th>
+                                    <th>Username</th>
+                                    <th>Password</th>
+                                    <th style="width:20%">Role</th>
+                                    <th style="width:15%">Action</th>
+                                    <th style="width:25%">Extend</th>
+                                </tr>
+                            </thead>
+                            <tbody id="account-list-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="sender-page" class="page">
+                <div class="content-box">
+                    <h2>WhatsApp Bug</h2>
+                    <div id="prefix-settings" style="display: none; border-top: 1px solid #2a2a3a; border-bottom: 1px solid #2a2a3a; padding: 15px 0; margin: 15px 0;">
+                        <h4 style="margin-bottom: 15px; color: #a7a9be;">Prefix Settings (Owner/Reseller)</h4>
+                        <div class="input-group">
+                            <label for="delay-prefix-input">Prefix Invisible Delay</label>
+                            <input type="text" id="delay-prefix-input" placeholder=".delay">
+                        </div>
+                        <div class="input-group">
+                            <label for="bug-prefix-input">Prefix iOS / Andro Crash</label>
+                            <input type="text" id="bug-prefix-input" placeholder=".bug">
+                        </div>
+                        <button class="submit-btn" id="save-prefix-btn" style="background-color: #3498db; font-size: 1em; padding: 10px;">Save Settings</button>
+                    </div>
+                    <form id="wa-form">
+                        
+                        <label style="display: block; margin-bottom: 5px; color: #a7a9be; text-align: left;">Select Mode</label>
+                        <div class="mode-selector">
+                            <button type="button" class="mode-btn active" data-mode="delay">Invisible Delay</button>
+                            <button type="button" class="mode-btn" data-mode="bug">iOS / Andro Crash</button>
+                        </div>
+                        <div class="input-group">
+                            <label for="target-number">Target Number</label>
+                            <input type="number" id="target-number" placeholder="Enter target number..." required>
+                        </div>
+                        <button type="submit" class="submit-btn" id="submit-btn">
+                            <b>KIRIM</b> <img src="kumbang1.png" alt="Send">
+                        </button>
+                        <p id="cooldown-timer" style="margin-top: 10px; color: #a7a9be;"></p>
+                    </form>
+                </div>
+            </div>
+            
+            <div id="admin-page" class="page">
+                <div class="content-box"><h2>ADMIN PANEL: Create Account</h2><form id="create-account-form"><div class="input-group"><label for="new-username">New Username</label><input type="text" id="new-username" required></div><div class="input-group"><label for="new-password">New Password</label><input type="text" id="new-password" required></div><div class="input-group"><label for="new-role">Select Role</label><select id="new-role" required></select></div><button type="submit" class="submit-btn">Create Account</button></form></div>
+            </div>
+            <div id="settings-page" class="page">
+                <div class="content-box">
+                    <h2>Account Settings</h2>
+                    <div class="subscription-status">
+                        <p>Username: <span id="profile-username" style="color: white;">-</span></p>
+                        <p>Role: <span id="profile-role" style="color: white;">-</span></p>
+                        <hr style="border-color: #2a2a3a; margin: 10px 0;">
+                        <p>Purchase Date: <span id="purchase-date">-</span></p>
+                        <p>Expires On: <span id="expiry-date">-</span></p>
+                        <p>Subscription Status: <span id="status-text">-</span></p>
+                        <p>Application Status: <span id="app-status-display">-</span></p>
+                        <a href="#" id="renew-link" class="action-btn renew-account-btn" style="display: block; text-decoration: none; margin-top: 10px;">Request Extension</a>
+                    </div>
+                    <div class="owner-controls" id="owner-controls" style="display: none;">
+                        <h3>Global Application Control</h3>
+                        <div class="control-buttons">
+                            <button class="apk-on-btn" id="apk-on-btn">APP ON</button>
+                            <button class="apk-off-btn" id="apk-off-btn">APP OFF</button>
+                        </div>
+                        <div style="margin-top: 20px; border-top: 1px solid #2a2a3a; padding-top: 20px;">
+                            <div class="input-group">
+                                <label for="active-sender-input">Set Active Sender Count</label>
+                                <input type="number" id="active-sender-input" placeholder="0">
+                            </div>
+                            <button id="save-active-sender-btn" class="submit-btn" style="background-color:#3498db">Save</button>
+                        </div>
+
+                        <div style="margin-top: 20px; border-top: 1px solid #2a2a3a; padding-top: 20px;">
+                            <h3>Login WA Link Settings</h3>
+                            <div class="input-group">
+                                <label for="admin-wa-login-input">Admin WA Number (for Login Page)</label>
+                                <input type="number" id="admin-wa-login-input" placeholder="628...">
+                            </div>
+                            <button id="save-admin-wa-login-btn" class="submit-btn" style="background-color:#3498db">Save WA Number</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <div id="messages-page" class="page">
+                <div class="content-box">
+                    <h2>Inbox (Admin)</h2>
+                    <div class="input-group">
+                        <label for="admin-wa-number">Your WhatsApp Number (62...)</label>
+                        <input type="number" id="admin-wa-number" placeholder="Fill once for all WA messages">
+                    </div>
+                    <div class="input-group">
+                        <label for="admin-tg-id">Your Telegram User ID</label>
+                        <input type="text" id="admin-tg-id" placeholder="Fill once for all TG messages">
+                    </div>
+                    <hr style="border-color: #2a2a3a; margin: 20px 0;">
+                    <div id="message-inbox-container" class="message-inbox"></div>
+                </div>
+            </div>
+            <div id="chat-list-page" class="page">
+                <div class="content-box">
+                    <h2>Private Messages</h2>
+                    <button id="start-new-chat-btn" class="submit-btn" style="margin-bottom: 20px; background-color: #27ae60;">Start New Chat</button>
+                    <div id="conversation-list" style="max-height: 400px; overflow-y: auto;"></div>
+                </div>
+            </div>
+            <div id="chat-window-page" class="page">
+                <div class="content-box">
+                    <div id="chat-window-header">
+                        <button id="back-to-chat-list-btn" class="action-btn" style="width: auto; background-color: #555;">Back</button>
+                        <h3 id="chat-partner-username"></h3>
+                        <button id="delete-chat-btn" class="action-btn delete-btn" style="width: auto;">Delete</button>
+                    </div>
+                    <div id="message-container"></div>
+                    <form id="message-form">
+                        <input type="text" id="message-input" placeholder="Type message..." required>
+                        <button type="submit" class="submit-btn" style="width: auto; margin-top: 0;">Send</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+        
+        <nav class="nav-bar">
+            <div class="nav-item" id="nav-home"><img src="home.png" alt="Home"><span>Home</span></div>
+            <div class="nav-item" id="nav-chat"><img src="pesan.png" alt="Messages"><span>Messages</span></div>
+            <div class="nav-item" id="nav-messages" style="display: none;"><img src="inbox.png" alt="Inbox"><span>Admin Inbox</span></div>
+            <div class="nav-item" id="nav-data" style="display: none;"><img src="data.png" alt="Data"><span>Data</span></div>
+            <div class="nav-item" id="nav-sender"><img src="kumbang1.png" alt="Bug"><span>Bug</span></div>
+            <div class="nav-item" id="nav-admin" style="display: none;"><img src="tambah.png" alt="Create Account"><span>Create Account</span></div>
+            <div class="nav-item" id="nav-settings"><img src="pengaturan.png" alt="Settings"><span>Settings</span></div>
+        </nav>
+    </div>
+
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal-box">
+            <h3 style="color: #88d3ce; margin-bottom: 20px;">Account Information</h3>
+            <div class="profile-info">
+                <p><span>Username</span> <b id="modal-username">-</b></p>
+                <p><span>Role</span> <b id="modal-role">-</b></p>
+                <p><span>Active Until</span> <b id="modal-expired">-</b></p>
+                <p><span>Status</span> <b id="modal-status">-</b></p>
+            </div>
+            <div class="modal-buttons">
+                <button id="logout-btn-modal" style="background-color: #e74c3c; color: white;">Logout</button>
+                <button id="close-profile-modal-btn" style="background-color: #555; color: white;">Close</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-box">
+            <h3 id="confirm-title" style="color: #e94560; margin-bottom: 10px;">Confirm Action</h3>
+            <p id="confirm-text">Are you sure?</p>
+            <div class="modal-buttons">
+                <button id="confirm-no-btn">Cancel</button>
+                <button id="confirm-yes-btn">Yes, Continue</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="user-search-modal">
+        <div class="modal-box">
+            <h3 style="color: #88d3ce; margin-bottom: 20px;">Search User</h3>
+            <div class="input-group">
+                <input type="search" id="user-search-input" placeholder="Type username to start...">
+            </div>
+            <div id="user-search-results"></div>
+            <div class="modal-buttons" style="margin-top: 20px;">
+                <button id="close-user-search-modal-btn" style="background-color: #555; color: white;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const appStatus = localStorage.getItem('appStatus') || 'ON';
+        const userRole = localStorage.getItem('role');
+        const savedUsername = localStorage.getItem('username');
+
+        function selfDestruct() {
+            let accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+            const updatedAccounts = accounts.filter(acc => acc.username !== savedUsername);
+            localStorage.setItem('accounts', JSON.stringify(updatedAccounts));
+            localStorage.removeItem(`purchaseDate_${savedUsername}`);
+            localStorage.removeItem(`expiryDate_${savedUsername}`);
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('username');
+            localStorage.removeItem('role');
+            
+            let onlineUsersList = JSON.parse(localStorage.getItem('onlineUsersList')) || [];
+            onlineUsersList = onlineUsersList.filter(user => user !== savedUsername);
+            localStorage.setItem('onlineUsersList', JSON.stringify(onlineUsersList));
+            
+            alert('Your account has been deleted because your subscription has expired.');
+            // --- PERUBAHAN DI SINI ---
+            window.location.href = 'index.html'; // Redirect ke index.html (login)
+            // --- AKHIR PERUBAHAN ---
+        }
+
+        function checkAccountExpiration() {
+            if (userRole === 'Owner') return false; 
+            const expiryDateISO = localStorage.getItem(`expiryDate_${savedUsername}`);
+            if (!expiryDateISO) return false;
+            const now = new Date();
+            const expiryDate = new Date(expiryDateISO);
+            const diffTime = now - expiryDate;
+            const diffDays = diffTime / (1000 * 60 * 60 * 24);
+            if (diffDays > 3) {
+                selfDestruct();
+                return true;
+            }
+            if (diffDays > 1) {
+                const overlay = document.createElement('div');
+                overlay.className = 'frozen-overlay';
+                overlay.innerHTML = `<div class="content-box"><h2>Subscription Expired</h2><p style="color: #a7a9be;">Features disabled. Please contact admin for extension.</p></div>`;
+                document.body.appendChild(overlay);
+                return false;
+            }
+            return false;
+        }
+
+        const isExpiredOrFrozen = checkAccountExpiration();
+
+        if (appStatus === 'OFF' && userRole !== 'Owner') {
+            document.body.innerHTML = `
+                <div class="blocked-page">
+                    <div class="content-box">
+                        <img src="logoug.png" alt="Logo" style="width: 100px; margin-bottom: 20px;">
+                        <h2>Application is OFF</h2>
+                        <p style="color: #a7a9be;">The application is temporarily disabled by the Owner.</p>
+                    </div>
+                </div>`;
+        } else if (!isExpiredOrFrozen) {
+            const navItems = document.querySelectorAll('.nav-item');
+            const pages = document.querySelectorAll('.page');
+            function showPage(pageId) {
+                pages.forEach(page => page.classList.remove('active'));
+                const targetPage = document.getElementById(pageId);
+                if(targetPage) targetPage.classList.add('active');
+                
+                navItems.forEach(item => item.classList.remove('active'));
+                let activeNavItemId;
+                if(pageId === 'chat-list-page' || pageId === 'chat-window-page') {
+                    activeNavItemId = 'nav-chat';
+                } else {
+                    activeNavItemId = `nav-${pageId.split('-')[0]}`;
+                }
+                const activeNavItem = document.getElementById(activeNavItemId);
+                if (activeNavItem) activeNavItem.classList.add('active');
+            }
+
+            function showNotification(message, type = 'info') {
+                const container = document.getElementById('notification-container');
+                if(!container) return;
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                container.appendChild(notification);
+                setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.5s forwards';
+                    setTimeout(() => container.removeChild(notification), 500);
+                }, 3000);
+            }
+
+            const confirmModal = document.getElementById('confirm-modal');
+            const confirmText = document.getElementById('confirm-text');
+            const confirmYesBtn = document.getElementById('confirm-yes-btn');
+            const confirmNoBtn = document.getElementById('confirm-no-btn');
+            let confirmCallback = () => {};
+            function showConfirm(text, onConfirm) {
+                confirmText.textContent = text;
+                confirmCallback = onConfirm;
+                confirmModal.classList.add('active');
+            }
+            function hideConfirm() {
+                confirmModal.classList.remove('active');
+            }
+            confirmYesBtn.addEventListener('click', () => {
+                confirmCallback();
+                hideConfirm();
+            });
+            confirmNoBtn.addEventListener('click', hideConfirm);
+
+            const profileModal = document.getElementById('profile-modal');
+            function showProfileModal() {
+                const savedUsername = localStorage.getItem('username');
+                const userRole = localStorage.getItem('role');
+                const expiryDateISO = localStorage.getItem(`expiryDate_${savedUsername}`);
+                let expiredText = "-";
+                let statusText = "Inactive";
+                let statusClass = "status-expired";
+                if (userRole === 'Owner') {
+                    expiredText = "Unlimited";
+                    statusText = "Active";
+                    statusClass = "status-active";
+                } else if (expiryDateISO) {
+                    const expiryDate = new Date(expiryDateISO);
+                    const now = new Date();
+                    if (now < expiryDate) {
+                        const diffTime = expiryDate - now;
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        expiredText = `${diffDays} days left`;
+                        statusText = "Active";
+                        statusClass = "status-active";
+                    } else {
+                        expiredText = "Expired";
+                    }
+                }
+                document.getElementById('modal-username').textContent = savedUsername;
+                document.getElementById('modal-role').textContent = userRole;
+                document.getElementById('modal-expired').textContent = expiredText;
+                const statusElem = document.getElementById('modal-status');
+                statusElem.textContent = statusText;
+                statusElem.className = statusClass;
+                profileModal.classList.add('active');
+            }
+            function hideProfileModal() {
+                profileModal.classList.remove('active');
+            }
+            
+            // --- PERUBAHAN DI SINI ---
+            if (!localStorage.getItem('isLoggedIn') || !savedUsername || !userRole) {
+                // Redirect ke index.html (login) jika belum login
+                window.location.href = 'index.html?error=unauthorized'; 
+            } else {
+                document.getElementById('welcome-username').textContent = savedUsername;
+            }
+            // --- AKHIR PERUBAHAN ---
+
+            if (userRole === 'Owner' || userRole === 'Reseller') {
+                document.getElementById('nav-messages').style.display = 'block';
+                document.getElementById('nav-admin').style.display = 'block';
+                document.getElementById('nav-data').style.display = 'block';
+                document.getElementById('nav-admin-icon').style.display = 'flex';
+                document.getElementById('nav-data-icon').style.display = 'flex';
+                
+                const prefixSettings = document.getElementById('prefix-settings');
+                if (prefixSettings) {
+                    prefixSettings.style.display = 'block';
+                    document.getElementById('delay-prefix-input').value = localStorage.getItem('customDelayPrefix') || '.delay';
+                    document.getElementById('bug-prefix-input').value = localStorage.getItem('customBugPrefix') || '.bug';
+                }
+            } else {
+                 document.getElementById('nav-data').style.display = 'none';
+                 document.getElementById('nav-data-icon').style.display = 'none';
+                 document.getElementById('nav-admin').style.display = 'none';
+                 document.getElementById('nav-admin-icon').style.display = 'none';
+            }
+            
+            if (userRole === 'Owner') {
+                document.getElementById('owner-controls').style.display = 'block';
+                document.getElementById('active-sender-input').value = localStorage.getItem('activeSenderCount') || 0;
+            }
+
+            const roleSelect = document.getElementById('new-role');
+            if (roleSelect) {
+                if (userRole === 'Owner') {
+                    roleSelect.innerHTML = `<option value="Member">Member (30 Days)</option><option value="VIP">VIP (1 Year)</option><option value="Reseller">Reseller (2 Years)</option>`;
+                } else if (userRole === 'Reseller') {
+                    roleSelect.innerHTML = `<option value="Member">Member (30 Days)</option><option value="VIP">VIP (1 Year)</option>`;
+                }
+            }
+            
+            const profileUsernameElem = document.getElementById('profile-username');
+            const profileRoleElem = document.getElementById('profile-role');
+            const purchaseDateElem = document.getElementById('purchase-date');
+            const expiryDateElem = document.getElementById('expiry-date');
+            const statusTextElem = document.getElementById('status-text');
+            const renewLink = document.getElementById('renew-link');
+            const submitBtn = document.getElementById('submit-btn');
+            const appStatusDisplay = document.getElementById('app-status-display');
+
+            function formatDate(dateString) {
+                if (!dateString) return "-";
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString('id-ID', options);
+            }
+
+            function updateSettingsPage() {
+                if(!profileUsernameElem) return;
+                profileUsernameElem.textContent = savedUsername;
+                profileRoleElem.textContent = userRole;
+                const currentAppStatus = localStorage.getItem('appStatus') || 'ON';
+                appStatusDisplay.textContent = currentAppStatus;
+                appStatusDisplay.className = currentAppStatus === 'ON' ? 'status-active' : 'status-expired';
+                if (userRole === 'Owner') {
+                    purchaseDateElem.textContent = formatDate(new Date().toISOString());
+                    expiryDateElem.textContent = "∞ (Unlimited)";
+                    statusTextElem.textContent = "Active";
+                    statusTextElem.className = 'status-active';
+                    renewLink.style.display = 'none';
+                    if(submitBtn) submitBtn.disabled = false;
+                    
+                    const adminWaLoginInput = document.getElementById('admin-wa-login-input');
+                    if (adminWaLoginInput) {
+                        adminWaLoginInput.value = localStorage.getItem('adminWaNumberLogin') || '6285664925502';
+                    }
+                } else {
+                    renewLink.style.display = 'block';
+                    const message = encodeURIComponent(`Hello, I am ${savedUsername} (Role: ${userRole}) and I want to extend my subscription.`);
+                    renewLink.href = `https://wa.me/6283111646400?text=${message}`; // Note: Nomor WA ini mungkin perlu disamakan dengan yang di login?
+                    const purchaseDateISO = localStorage.getItem(`purchaseDate_${savedUsername}`);
+                    const expiryDateISO = localStorage.getItem(`expiryDate_${savedUsername}`);
+                    purchaseDateElem.textContent = formatDate(purchaseDateISO);
+                    expiryDateElem.textContent = formatDate(expiryDateISO);
+                    if (!expiryDateISO || new Date() > new Date(expiryDateISO)) {
+                        statusTextElem.textContent = "Inactive";
+                        statusTextElem.className = 'status-expired';
+                        if(submitBtn) submitBtn.disabled = true;
+                    } else {
+                        statusTextElem.textContent = "Active";
+                        statusTextElem.className = 'status-active';
+                        if(submitBtn) submitBtn.disabled = false;
+                    }
+                }
+            }
+            
+            function loadAccountData(searchTerm = '') {
+                let accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+                const onlineUsersList = JSON.parse(localStorage.getItem('onlineUsersList')) || [];
+                
+                if (searchTerm) {
+                    accounts = accounts.filter(acc => acc.username.toLowerCase().includes(searchTerm.toLowerCase()));
+                }
+
+                document.getElementById('total-accounts').textContent = accounts.length;
+                const tableBody = document.getElementById('account-list-body');
+                tableBody.innerHTML = '';
+                accounts.forEach(acc => {
+                    const isOnline = onlineUsersList.includes(acc.username);
+                    const onlineClass = isOnline ? 'online' : '';
+                    let canDelete = true;
+                    if (acc.role === 'Owner' || acc.username === savedUsername) canDelete = false;
+                    if (userRole === 'Reseller' && acc.role === 'Reseller') canDelete = false;
+                    const deleteButton = canDelete 
+                        ? `<button class="action-btn delete-btn" onclick="deleteAccount('${acc.username}')">Delete</button>`
+                        : `<button class="action-btn delete-btn" disabled>Delete</button>`;
+                    const renewButton = (acc.role !== 'Owner' && acc.username !== savedUsername) ? `<button class="action-btn renew-account-btn" onclick="renewAccount('${acc.username}')">Extend</button>` : '';
+
+                    const row = `<tr><td><span class="online-status ${onlineClass}"></span></td><td>${acc.username}</td><td>${acc.password}</td><td>${acc.role}</td><td>${deleteButton}</td><td>${renewButton}</td></tr>`;
+                    tableBody.innerHTML += row;
+                });
+            }
+
+            function deleteAccount(usernameToDelete) {
+                showConfirm(`Are you sure you want to delete account "${usernameToDelete}"?`, () => {
+                    let accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+                    const updatedAccounts = accounts.filter(acc => acc.username !== usernameToDelete);
+                    localStorage.setItem('accounts', JSON.stringify(updatedAccounts));
+                    localStorage.removeItem(`purchaseDate_${usernameToDelete}`);
+                    localStorage.removeItem(`expiryDate_${usernameToDelete}`);
+                    showNotification(`ACCOUNT "${usernameToDelete}" HAS BEEN DELETED`, 'success');
+                    loadAccountData(document.getElementById('search-account-input').value);
+                    updateStatsPanel(); 
+                });
+            }
+            
+            function renewAccount(usernameToRenew) {
+                const expiryDateISO = localStorage.getItem(`expiryDate_${usernameToRenew}`);
+                const expiryDate = expiryDateISO ? new Date(expiryDateISO) : new Date();
+                
+                const newExpiry = (new Date() > expiryDate) ? new Date() : expiryDate;
+                newExpiry.setDate(newExpiry.getDate() + 30);
+                
+                localStorage.setItem(`expiryDate_${usernameToRenew}`, newExpiry.toISOString());
+                showNotification(`Account "${usernameToRenew}" subscription has been extended.`, 'success');
+                loadAccountData(document.getElementById('search-account-input').value);
+            }
+
+            function loadMessages() {
+                document.getElementById('admin-wa-number').value = localStorage.getItem('adminWaNumber') || '';
+                document.getElementById('admin-tg-id').value = localStorage.getItem('adminTgId') || '';
+
+                const queue = JSON.parse(localStorage.getItem('messageQueue')) || [];
+                const inboxContainer = document.getElementById('message-inbox-container');
+                inboxContainer.innerHTML = '';
+                if (queue.length === 0) {
+                    inboxContainer.innerHTML = '<p>No incoming messages.</p>';
+                    return;
+                }
+                queue.forEach(msg => {
+                    if (msg.status !== 'rejected') {
+                        const item = document.createElement('div');
+                        item.className = 'message-item';
+                        item.innerHTML = `
+                            <p><b>Sender:</b> ${msg.sender}</p>
+                            <p><b>Message:</b> ${msg.payload}</p>
+                            <div class="message-actions">
+                                <button class="accept-btn" onclick="acceptMessage('${msg.id}')">Accept (WA)</button>
+                                <button class="telegram-btn" onclick="sendToTelegram('${msg.id}')">Send (TG)</button>
+                                <button class="reject-btn" onclick="rejectMessage('${msg.id}')">Reject</button>
+                            </div>
+                        `;
+                        inboxContainer.appendChild(item);
+                    }
+                });
+            }
+
+            function acceptMessage(msgId) {
+                const adminWaNumber = document.getElementById('admin-wa-number').value;
+                if (!adminWaNumber) {
+                    showNotification('Please enter your WhatsApp number above!', 'error');
+                    return;
+                }
+                let queue = JSON.parse(localStorage.getItem('messageQueue')) || [];
+                const msg = queue.find(m => m.id === msgId);
+                if (msg) {
+                    const encodedMessage = encodeURIComponent(msg.payload);
+                    window.open(`https://wa.me/${adminWaNumber}?text=${encodedMessage}`, '_blank');
+                    const newQueue = queue.filter(m => m.id !== msgId);
+                    localStorage.setItem('messageQueue', JSON.stringify(newQueue));
+                    loadMessages();
+                }
+            }
+            
+            function sendToTelegram(msgId) {
+                const adminTgId = document.getElementById('admin-tg-id').value;
+                if (!adminTgId) {
+                    showNotification('Please enter your Telegram User ID above!', 'error');
+                    return;
+                }
+                let queue = JSON.parse(localStorage.getItem('messageQueue')) || [];
+                const msg = queue.find(m => m.id === msgId);
+                if (msg) {
+                    const encodedMessage = encodeURIComponent(msg.payload);
+                    const tgLink = adminTgId.startsWith('@') ? `https://t.me/${adminTgId.substring(1)}` : `https://t.me/${adminTgId}`;
+                    window.open(`${tgLink}?text=${encodedMessage}`, '_blank');
+                    const newQueue = queue.filter(m => m.id !== msgId);
+                    localStorage.setItem('messageQueue', JSON.stringify(newQueue));
+                    loadMessages();
+                }
+            }
+
+            function rejectMessage(msgId) {
+                let queue = JSON.parse(localStorage.getItem('messageQueue')) || [];
+                const newQueue = queue.map(m => {
+                    if (m.id === msgId) {
+                        return { ...m, status: 'rejected' };
+                    }
+                    return m;
+                });
+                localStorage.setItem('messageQueue', JSON.stringify(newQueue));
+                showNotification('Message has been rejected.', 'info');
+                loadMessages();
+            }
+
+            function updateStatsPanel() {
+                const accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+                document.getElementById('online-users-stat').textContent = accounts.length;
+                const activeSenderCount = localStorage.getItem('activeSenderCount') || '0';
+                document.getElementById('active-sender-stat').textContent = activeSenderCount;
+            }
+
+            document.getElementById('hamburger-btn').addEventListener('click', showProfileModal);
+            document.getElementById('profile-header-btn').addEventListener('click', showProfileModal);
+            document.getElementById('close-profile-modal-btn').addEventListener('click', hideProfileModal);
+            document.getElementById('logout-btn-modal').addEventListener('click', () => {
+                localStorage.removeItem('onlineUser'); 
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('username');
+                localStorage.removeItem('role');
+                showNotification('You have logged out.', 'info');
+                // --- PERUBAHAN DI SINI ---
+                setTimeout(() => window.location.href = 'index.html', 1000); // Redirect ke index.html (login)
+                // --- AKHIR PERUBAHAN ---
+            });
+            
+            document.getElementById('nav-home').addEventListener('click', () => { showPage('home-page'); updateStatsPanel(); });
+            document.getElementById('nav-sender').addEventListener('click', () => showPage('sender-page'));
+            document.getElementById('nav-data').addEventListener('click', () => { showPage('data-page'); loadAccountData(); });
+            document.getElementById('nav-settings').addEventListener('click', () => { showPage('settings-page'); updateSettingsPage(); });
+            document.getElementById('nav-admin').addEventListener('click', () => showPage('admin-page'));
+            document.getElementById('nav-messages').addEventListener('click', () => { showPage('messages-page'); loadMessages(); });
+            
+            document.getElementById('nav-admin-icon').addEventListener('click', (e) => { e.preventDefault(); showPage('admin-page'); });
+            document.getElementById('nav-sender-icon').addEventListener('click', (e) => { e.preventDefault(); showPage('sender-page'); });
+            document.getElementById('nav-data-icon').addEventListener('click', (e) => { e.preventDefault(); showPage('data-page'); loadAccountData(); });
+            document.getElementById('nav-settings-icon').addEventListener('click', (e) => { e.preventDefault(); showPage('settings-page'); updateSettingsPage(); });
+            document.getElementById('nav-chat-icon').addEventListener('click', (e) => { e.preventDefault(); showPage('chat-list-page'); loadConversations(); });
+            
+            document.getElementById('search-account-input').addEventListener('input', (e) => loadAccountData(e.target.value));
+            
+            document.getElementById('create-account-form')?.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const newUsername = document.getElementById('new-username').value;
+                const newPassword = document.getElementById('new-password').value;
+                const newRole = document.getElementById('new-role').value;
+                const accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+                if (accounts.some(acc => acc.username === newUsername)) {
+                    showNotification(`Username "${newUsername}" is already taken!`, 'error'); return;
+                }
+                const now = new Date(); const expiry = new Date();
+                if (newRole === 'Member') { expiry.setDate(now.getDate() + 30); }
+                else if (newRole === 'VIP') { expiry.setFullYear(now.getFullYear() + 1); }
+                else if (newRole === 'Reseller') { expiry.setFullYear(now.getFullYear() + 2); }
+                accounts.push({ username: newUsername, password: newPassword, role: newRole });
+                localStorage.setItem('accounts', JSON.stringify(accounts));
+                localStorage.setItem(`purchaseDate_${newUsername}`, now.toISOString());
+                localStorage.setItem(`expiryDate_${newUsername}`, expiry.toISOString());
+                showNotification(`Account ${newRole} "${newUsername}" has been created successfully!`, 'success');
+                event.target.reset();
+                updateStatsPanel(); 
+            });
+
+            
+            const modeButtons = document.querySelectorAll('.mode-btn');
+            if(modeButtons.length > 0) {
+                modeButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        if (!button.classList.contains('active')) {
+                            modeButtons.forEach(btn => btn.classList.remove('active'));
+                            button.classList.add('active');
+                        }
+                    });
+                });
+            }
+
+            document.getElementById('wa-form')?.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const submitBtn = document.getElementById('submit-btn');
+                const cooldownTimer = document.getElementById('cooldown-timer');
+                const COOLDOWN_SECONDS = 300;
+                
+                const selectedModeValue = document.querySelector('.mode-btn.active').dataset.mode; 
+                let selectedModePrefix;
+
+                if (selectedModeValue === 'delay') {
+                    selectedModePrefix = localStorage.getItem('customDelayPrefix') || '.delay';
+                } else if (selectedModeValue === 'bug') {
+                    selectedModePrefix = localStorage.getItem('customBugPrefix') || '.bug';
+                }
+
+                const targetNumber = document.getElementById('target-number').value;
+                const payload = `${selectedModePrefix} ${targetNumber}`;
+
+                let queue = JSON.parse(localStorage.getItem('messageQueue')) || [];
+                queue.push({ id: `msg_${Date.now()}`, sender: savedUsername, payload: payload, status: 'pending' });
+                localStorage.setItem('messageQueue', JSON.stringify(queue));
+                showNotification('Success! Message sent to Admin.', 'success');
+                submitBtn.disabled = true;
+                let timeLeft = COOLDOWN_SECONDS;
+                cooldownTimer.textContent = `Please wait ${timeLeft} seconds...`;
+                const interval = setInterval(() => {
+                    timeLeft--;
+                    cooldownTimer.textContent = `Please wait ${timeLeft} seconds...`;
+                    if (timeLeft <= 0) {
+                        clearInterval(interval);
+                        cooldownTimer.textContent = '';
+                        submitBtn.disabled = false;
+                    }
+                }, 1000);
+            });
+
+            const savePrefixBtn = document.getElementById('save-prefix-btn');
+            if (savePrefixBtn) {
+                savePrefixBtn.addEventListener('click', () => {
+                    const delayPrefix = document.getElementById('delay-prefix-input').value;
+                    const bugPrefix = document.getElementById('bug-prefix-input').value;
+                    localStorage.setItem('customDelayPrefix', delayPrefix);
+                    localStorage.setItem('customBugPrefix', bugPrefix);
+                    showNotification('Prefix settings saved successfully!', 'success');
+                });
+            }
+
+            const saveActiveSenderBtn = document.getElementById('save-active-sender-btn');
+            if(saveActiveSenderBtn) {
+                saveActiveSenderBtn.addEventListener('click', () => {
+                    const count = document.getElementById('active-sender-input').value;
+                    localStorage.setItem('activeSenderCount', count);
+                    showNotification('Active Sender count saved successfully!', 'success');
+                    updateStatsPanel();
+                });
+            }
+            
+            document.getElementById('admin-wa-number')?.addEventListener('input', (e) => localStorage.setItem('adminWaNumber', e.target.value));
+            document.getElementById('admin-tg-id')?.addEventListener('input', (e) => localStorage.setItem('adminTgId', e.target.value));
+            
+            document.getElementById('apk-on-btn')?.addEventListener('click', () => {
+                localStorage.setItem('appStatus', 'ON');
+                updateSettingsPage();
+                showNotification('Application activated (ON).', 'success');
+            });
+            document.getElementById('apk-off-btn')?.addEventListener('click', () => {
+                localStorage.setItem('appStatus', 'OFF');
+                updateSettingsPage();
+                showNotification('Application deactivated (OFF).', 'error');
+            });
+
+            const saveAdminWaLoginBtn = document.getElementById('save-admin-wa-login-btn');
+            if(saveAdminWaLoginBtn) {
+                saveAdminWaLoginBtn.addEventListener('click', () => {
+                    const waNumber = document.getElementById('admin-wa-login-input').value;
+                    if (waNumber && waNumber.startsWith('62')) {
+                        localStorage.setItem('adminWaNumberLogin', waNumber);
+                        showNotification('WA number for login page saved successfully!', 'success');
+                    } else {
+                        showNotification('WA number must start with 62 (e.g., 628123...)', 'error');
+                    }
+                });
+            }
+
+            let currentChatPartner = null;
+            const userSearchModal = document.getElementById('user-search-modal');
+
+            function getConversationId(user1, user2) {
+                return [user1, user2].sort().join('_');
+            }
+
+            function loadConversations() {
+                const chats = JSON.parse(localStorage.getItem('chats')) || {};
+                const conversationList = document.getElementById('conversation-list');
+                conversationList.innerHTML = '';
+                const myConversations = Object.entries(chats).filter(([id, data]) => data.participants.includes(savedUsername));
+
+                if (myConversations.length === 0) {
+                    conversationList.innerHTML = '<p>No conversations yet. Start a new chat to begin!</p>';
+                    return;
+                }
+
+                myConversations.sort(([, a], [, b]) => {
+                    const lastMsgA = a.messages[a.messages.length - 1];
+                    const lastMsgB = b.messages[b.messages.length - 1];
+                    if (!lastMsgA) return 1;
+                    if (!lastMsgB) return -1;
+                    return new Date(lastMsgB.timestamp) - new Date(lastMsgA.timestamp);
+                });
+
+                myConversations.forEach(([id, data]) => {
+                    const partner = data.participants.find(p => p !== savedUsername);
+                    const lastMessage = data.messages.length > 0 ? data.messages[data.messages.length - 1].text : 'No messages yet.';
+                    
+                    const item = document.createElement('div');
+                    item.className = 'conversation-list-item';
+                    item.onclick = () => openChat(partner);
+                    item.innerHTML = `
+                        <div class="conversation-info">
+                            <div class="username">${partner}</div>
+                            <div class="last-message">${lastMessage.substring(0, 30)}${lastMessage.length > 30 ? '...' : ''}</div>
+                        </div>
+                    `;
+                    conversationList.appendChild(item);
+                });
+            }
+
+            function openChat(partnerUsername) {
+                currentChatPartner = partnerUsername;
+                document.getElementById('chat-partner-username').textContent = partnerUsername;
+                loadChatMessages(partnerUsername);
+                showPage('chat-window-page');
+            }
+
+            function loadChatMessages(partnerUsername) {
+                const conversationId = getConversationId(savedUsername, partnerUsername);
+                const chats = JSON.parse(localStorage.getItem('chats')) || {};
+                const conversation = chats[conversationId] || { messages: [] };
+                const messageContainer = document.getElementById('message-container');
+                messageContainer.innerHTML = '';
+
+                conversation.messages.forEach(msg => {
+                    const bubble = document.createElement('div');
+                    bubble.className = `message-bubble ${msg.sender === savedUsername ? 'sent' : 'received'}`;
+                    
+                    const text = document.createElement('p');
+                    text.textContent = msg.text;
+                    
+                    const timestamp = document.createElement('span');
+                    timestamp.className = 'timestamp';
+                    timestamp.textContent = new Date(msg.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+                    bubble.appendChild(text);
+                    bubble.appendChild(timestamp);
+                    messageContainer.appendChild(bubble);
+                });
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+            }
+
+            function sendMessage() {
+                const input = document.getElementById('message-input');
+                const text = input.value.trim();
+                if (!text || !currentChatPartner) return;
+
+                const conversationId = getConversationId(savedUsername, currentChatPartner);
+                const chats = JSON.parse(localStorage.getItem('chats')) || {};
+
+                if (!chats[conversationId]) {
+                    chats[conversationId] = {
+                        participants: [savedUsername, currentChatPartner],
+                        messages: []
+                    };
+                }
+
+                const newMessage = {
+                    id: Date.now(),
+                    sender: savedUsername,
+                    receiver: currentChatPartner,
+                    text: text,
+                    timestamp: new Date().toISOString()
+                };
+
+                chats[conversationId].messages.push(newMessage);
+                localStorage.setItem('chats', JSON.stringify(chats));
+                
+                input.value = '';
+                loadChatMessages(currentChatPartner);
+            }
+
+            document.getElementById('start-new-chat-btn').addEventListener('click', () => {
+                userSearchModal.classList.add('active');
+                document.getElementById('user-search-input').focus();
+            });
+            
+            document.getElementById('close-user-search-modal-btn').addEventListener('click', () => {
+                userSearchModal.classList.remove('active');
+                document.getElementById('user-search-input').value = '';
+                document.getElementById('user-search-results').innerHTML = '';
+            });
+
+            document.getElementById('user-search-input').addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const resultsContainer = document.getElementById('user-search-results');
+                resultsContainer.innerHTML = '';
+
+                if (searchTerm.length === 0) return;
+
+                const accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+                const results = accounts.filter(acc => acc.username.toLowerCase().includes(searchTerm) && acc.username.toLowerCase() !== savedUsername.toLowerCase());
+
+                if (results.length > 0) {
+                    results.forEach(acc => {
+                        const item = document.createElement('div');
+                        item.className = 'search-result-item';
+                        item.textContent = acc.username;
+                        item.onclick = () => {
+                            userSearchModal.classList.remove('active');
+                            document.getElementById('user-search-input').value = '';
+                            resultsContainer.innerHTML = '';
+                            openChat(acc.username);
+                        };
+                        resultsContainer.appendChild(item);
+                    });
+                } else {
+                    resultsContainer.innerHTML = '<p style="color: #aaa; padding: 10px;">No user found.</p>';
+                }
+            });
+
+            document.getElementById('message-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                sendMessage();
+            });
+
+            document.getElementById('back-to-chat-list-btn').addEventListener('click', () => {
+                currentChatPartner = null;
+                showPage('chat-list-page');
+                loadConversations();
+            });
+            
+            document.getElementById('delete-chat-btn').addEventListener('click', () => {
+                if (!currentChatPartner) return;
+                showConfirm(`Are you sure you want to delete all conversations with "${currentChatPartner}"? This action cannot be undone.`, () => {
+                    const conversationId = getConversationId(savedUsername, currentChatPartner);
+                    const chats = JSON.parse(localStorage.getItem('chats')) || {};
+                    delete chats[conversationId];
+                    localStorage.setItem('chats', JSON.stringify(chats));
+                    showNotification(`Conversation with ${currentChatPartner} has been deleted.`, 'success');
+                    document.getElementById('back-to-chat-list-btn').click();
+                });
+            });
+
+            document.getElementById('nav-chat').addEventListener('click', () => {
+                showPage('chat-list-page');
+                loadConversations();
+            });
+            
+            showPage('home-page');
+            updateSettingsPage();
+            updateStatsPanel();
+        }
+    </script>
+</body>
+</html>

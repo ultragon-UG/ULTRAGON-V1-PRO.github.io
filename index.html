@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ULTRAGON V1 PRO - Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; }
+        body { background: #1a1a2e; color: #e0e0e0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .login-container { perspective: 1000px; }
+        .login-box { background: #16213e; padding: 40px; border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); text-align: center; width: 350px; border: 1px solid #0f3460; }
+        .logo { width: 100px; height: auto; margin-bottom: 20px; }
+        .login-box h2 { font-size: 2.5em; color: #e94560; margin-bottom: 5px; }
+        .login-box .version { background: #e94560; color: #fff; padding: 2px 8px; font-size: 0.8em; border-radius: 5px; font-weight: bold; display: inline-block; margin-bottom: 25px; }
+        .input-group { text-align: left; margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #a7a9be; }
+        .input-group input { width: 100%; padding: 12px; border: 1px solid #0f3460; background: #1a1a2e; border-radius: 8px; color: #fff; font-size: 1em; }
+        .buy-password { text-align: right; margin-top: -10px; margin-bottom: 20px; }
+        .buy-password a { color: #a7a9be; font-size: 0.8em; text-decoration: none; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; background: #e94560; color: #fff; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+        button:disabled { background: #555; cursor: not-allowed; }
+        button, a, input, select { outline: none !important; box-shadow: none !important; -webkit-tap-highlight-color: transparent; }
+        #notification-container { position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; }
+        .notification { padding: 15px 20px; border-radius: 8px; color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); opacity: 0; transform: translateX(100%); animation: slideIn 0.5s forwards; }
+        .notification.error { background: #e74c3c; } .notification.info { background: #3498db; }
+        @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideOut { to { opacity: 0; transform: translateX(100%); } }
+    </style>
+</head>
+<body>
+    <div id="notification-container"></div>
+    <div class="login-container">
+        <div class="login-box">
+            <img src="logoug.png" alt="Logo ULTRAGON" class="logo">
+            <h2>ULTRAGON</h2>
+            <span class="version">V1 PRO</span>
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Enter your username" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                <div class="buy-password">
+                    <a href="#" id="buy-link" target="_blank">
+                        Don't have an account? Buy here
+                    </a>
+                </div>
+                <button type="submit" id="login-btn">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            container.appendChild(notification);
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.5s forwards';
+                setTimeout(() => container.removeChild(notification), 500);
+            }, 3000);
+        }
+        
+        (function updateBuyLink() {
+            const adminWaNumber = localStorage.getItem('adminWaNumberLogin') || '6285664925502';
+            const waMessage = encodeURIComponent("Hello, I want to order a username and password for ULTRAGON V1 PRO.");
+            const buyLink = document.getElementById('buy-link');
+            if (buyLink) {
+                buyLink.href = `https://wa.me/${adminWaNumber}?text=${waMessage}`;
+            }
+        })();
+
+        // --- PERUBAHAN DI SINI ---
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            // Arahkan ke nama file dashboard yang baru
+            window.location.href = 'index1.html'; 
+        } else {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('error') === 'unauthorized') {
+                showNotification('You must log in first!', 'error');
+            }
+        }
+        // --- AKHIR PERUBAHAN ---
+
+        const loginForm = document.getElementById('login-form');
+        const loginBtn = document.getElementById('login-btn');
+        const MASTER_PASSWORD = "MASTER KING";
+
+        loginForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const usernameInput = document.getElementById('username').value;
+            const passwordInput = document.getElementById('password').value;
+
+            loginBtn.textContent = 'Verifying...';
+            loginBtn.disabled = true;
+
+            setTimeout(() => {
+                const appStatus = localStorage.getItem('appStatus') || 'ON';
+                const isOwnerLogin = passwordInput === MASTER_PASSWORD;
+
+                if (appStatus === 'OFF' && !isOwnerLogin) {
+                    showNotification('Application is OFF. Try again later.', 'error');
+                    loginBtn.textContent = 'Login';
+                    loginBtn.disabled = false;
+                    return;
+                }
+
+                let loginSuccess = false;
+                let userRole = '';
+
+                if (isOwnerLogin) {
+                    userRole = 'Owner';
+                    loginSuccess = true;
+                } else {
+                    const accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+                    const foundUser = accounts.find(acc => acc.username === usernameInput && acc.password === passwordInput);
+                    
+                    if (foundUser) {
+                        userRole = foundUser.role;
+                        loginSuccess = true;
+                    }
+                }
+
+                if (loginSuccess) {
+                    const newSessionId = Date.now().toString();
+                    localStorage.setItem('sessionId', newSessionId);
+
+                    if (userRole === 'Owner') {
+                        localStorage.setItem('owner_activeSessionId', newSessionId);
+                    } else {
+                        let accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+                        const userIndex = accounts.findIndex(acc => acc.username === usernameInput);
+                        if (userIndex !== -1) {
+                            accounts[userIndex].activeSessionId = newSessionId;
+                            localStorage.setItem('accounts', JSON.stringify(accounts));
+                        }
+                    }
+
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('username', usernameInput);
+                    localStorage.setItem('role', userRole);
+                    localStorage.setItem('onlineUser', usernameInput);
+
+                    // --- PERUBAHAN DI SINI ---
+                    // Arahkan ke nama file dashboard yang baru setelah login sukses
+                    window.location.href = 'index1.html'; 
+                    // --- AKHIR PERUBAHAN ---
+
+                } else {
+                    showNotification('Login Failed! Incorrect username or password.', 'error');
+                    loginBtn.textContent = 'Login';
+                    loginBtn.disabled = false;
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
