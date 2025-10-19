@@ -324,7 +324,7 @@
                     </a>
                 </div>
                 
-                <a href="https://t.me/+ewRqxzWttLo3ZmU1" target="_blank" class="telegram-custom-banner">
+                <a href="#" id="telegram-banner-link" target="_blank" class="telegram-custom-banner"> 
                     <div class="banner-content">
                         <img src="orang.png" alt="People Icon" class="banner-icon-img">
                         <span class="banner-text">
@@ -334,7 +334,6 @@
                     </div>
                     <span class="arrow-icon">⟩</span>
                 </a>
-                
                 <div class="stats-panel">
                     <div class="stats-header">
                         <img src="stats-icon.png" alt=""> <span>Server Stats</span>
@@ -453,7 +452,16 @@
                             </div>
                             <button id="save-admin-wa-login-btn" class="submit-btn" style="background-color:#3498db">Save WA Number</button>
                         </div>
-                    </div>
+                        
+                        <div style="margin-top: 20px; border-top: 1px solid #2a2a3a; padding-top: 20px;">
+                            <h3>Telegram Banner Link Settings</h3>
+                            <div class="input-group">
+                                <label for="telegram-link-input">Telegram Banner Link</label>
+                                <input type="url" id="telegram-link-input" placeholder="https://t.me/...">
+                            </div>
+                            <button id="save-telegram-link-btn" class="submit-btn" style="background-color:#3498db">Save Telegram Link</button>
+                        </div>
+                        </div>
                 </div>
             </div>
              <div id="messages-page" class="page">
@@ -563,9 +571,7 @@
             localStorage.setItem('onlineUsersList', JSON.stringify(onlineUsersList));
             
             alert('Your account has been deleted because your subscription has expired.');
-            // --- PERUBAHAN DI SINI ---
-            window.location.href = 'index.html'; // Redirect ke index.html (login)
-            // --- AKHIR PERUBAHAN ---
+            window.location.href = 'index.html'; 
         }
 
         function checkAccountExpiration() {
@@ -585,23 +591,15 @@
                 overlay.className = 'frozen-overlay';
                 overlay.innerHTML = `<div class="content-box"><h2>Subscription Expired</h2><p style="color: #a7a9be;">Features disabled. Please contact admin for extension.</p></div>`;
                 document.body.appendChild(overlay);
-                return false;
+                return false; 
             }
             return false;
         }
 
         const isExpiredOrFrozen = checkAccountExpiration();
-
-        if (appStatus === 'OFF' && userRole !== 'Owner') {
-            document.body.innerHTML = `
-                <div class="blocked-page">
-                    <div class="content-box">
-                        <img src="logoug.png" alt="Logo" style="width: 100px; margin-bottom: 20px;">
-                        <h2>Application is OFF</h2>
-                        <p style="color: #a7a9be;">The application is temporarily disabled by the Owner.</p>
-                    </div>
-                </div>`;
-        } else if (!isExpiredOrFrozen) {
+        
+        if (!isExpiredOrFrozen) { 
+            
             const navItems = document.querySelectorAll('.nav-item');
             const pages = document.querySelectorAll('.page');
             function showPage(pageId) {
@@ -689,14 +687,11 @@
                 profileModal.classList.remove('active');
             }
             
-            // --- PERUBAHAN DI SINI ---
             if (!localStorage.getItem('isLoggedIn') || !savedUsername || !userRole) {
-                // Redirect ke index.html (login) jika belum login
                 window.location.href = 'index.html?error=unauthorized'; 
             } else {
                 document.getElementById('welcome-username').textContent = savedUsername;
             }
-            // --- AKHIR PERUBAHAN ---
 
             if (userRole === 'Owner' || userRole === 'Reseller') {
                 document.getElementById('nav-messages').style.display = 'block';
@@ -738,7 +733,7 @@
             const expiryDateElem = document.getElementById('expiry-date');
             const statusTextElem = document.getElementById('status-text');
             const renewLink = document.getElementById('renew-link');
-            const submitBtn = document.getElementById('submit-btn');
+            const submitBtn = document.getElementById('submit-btn'); 
             const appStatusDisplay = document.getElementById('app-status-display');
 
             function formatDate(dateString) {
@@ -748,40 +743,55 @@
             }
 
             function updateSettingsPage() {
-                if(!profileUsernameElem) return;
+                if(!profileUsernameElem) return; 
+                
                 profileUsernameElem.textContent = savedUsername;
                 profileRoleElem.textContent = userRole;
                 const currentAppStatus = localStorage.getItem('appStatus') || 'ON';
                 appStatusDisplay.textContent = currentAppStatus;
                 appStatusDisplay.className = currentAppStatus === 'ON' ? 'status-active' : 'status-expired';
+                
                 if (userRole === 'Owner') {
                     purchaseDateElem.textContent = formatDate(new Date().toISOString());
                     expiryDateElem.textContent = "∞ (Unlimited)";
                     statusTextElem.textContent = "Active";
                     statusTextElem.className = 'status-active';
                     renewLink.style.display = 'none';
-                    if(submitBtn) submitBtn.disabled = false;
+                    if(submitBtn) submitBtn.disabled = false; 
                     
                     const adminWaLoginInput = document.getElementById('admin-wa-login-input');
                     if (adminWaLoginInput) {
                         adminWaLoginInput.value = localStorage.getItem('adminWaNumberLogin') || '6285664925502';
                     }
-                } else {
+                    // --- UPDATE INPUT TELEGRAM LINK ---
+                    const telegramLinkInput = document.getElementById('telegram-link-input');
+                    if (telegramLinkInput) {
+                        telegramLinkInput.value = localStorage.getItem('telegramBannerLink') || 'https://t.me/+ewRqxzWttLo3ZmU1';
+                    }
+                    // --- AKHIR UPDATE ---
+                    
+                } else { 
                     renewLink.style.display = 'block';
                     const message = encodeURIComponent(`Hello, I am ${savedUsername} (Role: ${userRole}) and I want to extend my subscription.`);
-                    renewLink.href = `https://wa.me/6283111646400?text=${message}`; // Note: Nomor WA ini mungkin perlu disamakan dengan yang di login?
+                    const contactWaNumber = localStorage.getItem('adminWaNumberLogin') || '6283111646400'; 
+                    renewLink.href = `https://wa.me/${contactWaNumber}?text=${message}`; 
+                    
                     const purchaseDateISO = localStorage.getItem(`purchaseDate_${savedUsername}`);
                     const expiryDateISO = localStorage.getItem(`expiryDate_${savedUsername}`);
                     purchaseDateElem.textContent = formatDate(purchaseDateISO);
                     expiryDateElem.textContent = formatDate(expiryDateISO);
-                    if (!expiryDateISO || new Date() > new Date(expiryDateISO)) {
-                        statusTextElem.textContent = "Inactive";
-                        statusTextElem.className = 'status-expired';
-                        if(submitBtn) submitBtn.disabled = true;
+                    
+                    const isExpired = !expiryDateISO || new Date() > new Date(expiryDateISO);
+                    const isAppOffForUser = currentAppStatus === 'OFF'; 
+
+                    if (isExpired || isAppOffForUser) {
+                        statusTextElem.textContent = isExpired ? "Expired" : "Active"; 
+                        statusTextElem.className = isExpired ? 'status-expired' : 'status-active';
+                        if(submitBtn) submitBtn.disabled = true; 
                     } else {
                         statusTextElem.textContent = "Active";
                         statusTextElem.className = 'status-active';
-                        if(submitBtn) submitBtn.disabled = false;
+                        if(submitBtn) submitBtn.disabled = false; 
                     }
                 }
             }
@@ -922,6 +932,16 @@
                 document.getElementById('active-sender-stat').textContent = activeSenderCount;
             }
 
+            // --- FUNGSI BARU UNTUK UPDATE LINK TELEGRAM BANNER ---
+            function updateTelegramBannerLink() {
+                const telegramLinkElement = document.getElementById('telegram-banner-link');
+                if (telegramLinkElement) {
+                    const savedLink = localStorage.getItem('telegramBannerLink') || 'https://t.me/+ewRqxzWttLo3ZmU1';
+                    telegramLinkElement.href = savedLink;
+                }
+            }
+            // --- AKHIR FUNGSI BARU ---
+
             document.getElementById('hamburger-btn').addEventListener('click', showProfileModal);
             document.getElementById('profile-header-btn').addEventListener('click', showProfileModal);
             document.getElementById('close-profile-modal-btn').addEventListener('click', hideProfileModal);
@@ -931,20 +951,31 @@
                 localStorage.removeItem('username');
                 localStorage.removeItem('role');
                 showNotification('You have logged out.', 'info');
-                // --- PERUBAHAN DI SINI ---
-                setTimeout(() => window.location.href = 'index.html', 1000); // Redirect ke index.html (login)
-                // --- AKHIR PERUBAHAN ---
+                setTimeout(() => window.location.href = 'index.html', 1000); 
             });
             
-            document.getElementById('nav-home').addEventListener('click', () => { showPage('home-page'); updateStatsPanel(); });
-            document.getElementById('nav-sender').addEventListener('click', () => showPage('sender-page'));
+            // --- UPDATE LINK BANNER SAAT HOME DITAMPILKAN ---
+            document.getElementById('nav-home').addEventListener('click', () => { 
+                showPage('home-page'); 
+                updateStatsPanel(); 
+                updateTelegramBannerLink(); // Panggil update link
+            });
+            // --- AKHIR UPDATE ---
+            document.getElementById('nav-sender').addEventListener('click', () => { 
+                showPage('sender-page'); 
+                updateSettingsPage(); 
+            });
             document.getElementById('nav-data').addEventListener('click', () => { showPage('data-page'); loadAccountData(); });
             document.getElementById('nav-settings').addEventListener('click', () => { showPage('settings-page'); updateSettingsPage(); });
             document.getElementById('nav-admin').addEventListener('click', () => showPage('admin-page'));
             document.getElementById('nav-messages').addEventListener('click', () => { showPage('messages-page'); loadMessages(); });
             
             document.getElementById('nav-admin-icon').addEventListener('click', (e) => { e.preventDefault(); showPage('admin-page'); });
-            document.getElementById('nav-sender-icon').addEventListener('click', (e) => { e.preventDefault(); showPage('sender-page'); });
+            document.getElementById('nav-sender-icon').addEventListener('click', (e) => { 
+                e.preventDefault(); 
+                showPage('sender-page'); 
+                updateSettingsPage(); 
+            });
             document.getElementById('nav-data-icon').addEventListener('click', (e) => { e.preventDefault(); showPage('data-page'); loadAccountData(); });
             document.getElementById('nav-settings-icon').addEventListener('click', (e) => { e.preventDefault(); showPage('settings-page'); updateSettingsPage(); });
             document.getElementById('nav-chat-icon').addEventListener('click', (e) => { e.preventDefault(); showPage('chat-list-page'); loadConversations(); });
@@ -988,7 +1019,17 @@
 
             document.getElementById('wa-form')?.addEventListener('submit', (event) => {
                 event.preventDefault();
-                const submitBtn = document.getElementById('submit-btn');
+
+                const currentAppStatusCheck = localStorage.getItem('appStatus') || 'ON';
+                const currentUserRoleCheck = localStorage.getItem('role');
+                if (currentAppStatusCheck === 'OFF' && currentUserRoleCheck !== 'Owner') {
+                    showNotification('Application is currently OFF. Bug feature disabled.', 'error');
+                    const submitBtnBug = document.getElementById('submit-btn'); 
+                    if (submitBtnBug) submitBtnBug.disabled = true;
+                    return; 
+                }
+
+                const submitBtnLocal = document.getElementById('submit-btn'); 
                 const cooldownTimer = document.getElementById('cooldown-timer');
                 const COOLDOWN_SECONDS = 300;
                 
@@ -1008,7 +1049,9 @@
                 queue.push({ id: `msg_${Date.now()}`, sender: savedUsername, payload: payload, status: 'pending' });
                 localStorage.setItem('messageQueue', JSON.stringify(queue));
                 showNotification('Success! Message sent to Admin.', 'success');
-                submitBtn.disabled = true;
+                
+                if(submitBtnLocal) submitBtnLocal.disabled = true; 
+                
                 let timeLeft = COOLDOWN_SECONDS;
                 cooldownTimer.textContent = `Please wait ${timeLeft} seconds...`;
                 const interval = setInterval(() => {
@@ -1017,7 +1060,11 @@
                     if (timeLeft <= 0) {
                         clearInterval(interval);
                         cooldownTimer.textContent = '';
-                        submitBtn.disabled = false;
+                        const finalAppStatus = localStorage.getItem('appStatus') || 'ON';
+                        const finalUserRole = localStorage.getItem('role');
+                        if (finalAppStatus === 'ON' || finalUserRole === 'Owner') {
+                            if(submitBtnLocal) submitBtnLocal.disabled = false;
+                        }
                     }
                 }, 1000);
             });
@@ -1048,12 +1095,12 @@
             
             document.getElementById('apk-on-btn')?.addEventListener('click', () => {
                 localStorage.setItem('appStatus', 'ON');
-                updateSettingsPage();
+                updateSettingsPage(); 
                 showNotification('Application activated (ON).', 'success');
             });
             document.getElementById('apk-off-btn')?.addEventListener('click', () => {
                 localStorage.setItem('appStatus', 'OFF');
-                updateSettingsPage();
+                updateSettingsPage(); 
                 showNotification('Application deactivated (OFF).', 'error');
             });
 
@@ -1064,11 +1111,31 @@
                     if (waNumber && waNumber.startsWith('62')) {
                         localStorage.setItem('adminWaNumberLogin', waNumber);
                         showNotification('WA number for login page saved successfully!', 'success');
+                        // Update link perpanjangan di halaman setting user lain secara real-time (opsional, tapi bagus)
+                        updateSettingsPage(); 
                     } else {
                         showNotification('WA number must start with 62 (e.g., 628123...)', 'error');
                     }
                 });
             }
+            
+            // --- EVENT LISTENER BARU UNTUK SIMPAN LINK TELEGRAM ---
+            const saveTelegramLinkBtn = document.getElementById('save-telegram-link-btn');
+            if (saveTelegramLinkBtn) {
+                saveTelegramLinkBtn.addEventListener('click', () => {
+                    const newLink = document.getElementById('telegram-link-input').value;
+                    // Validasi sederhana: pastikan tidak kosong dan mungkin mulai dengan https://t.me/
+                    if (newLink && newLink.startsWith('https://t.me/')) {
+                        localStorage.setItem('telegramBannerLink', newLink);
+                        showNotification('Telegram banner link saved successfully!', 'success');
+                        updateTelegramBannerLink(); // Langsung update banner jika halaman home sedang aktif
+                    } else {
+                        showNotification('Invalid Telegram link. It should start with https://t.me/', 'error');
+                    }
+                });
+            }
+            // --- AKHIR EVENT LISTENER BARU ---
+
 
             let currentChatPartner = null;
             const userSearchModal = document.getElementById('user-search-modal');
@@ -1242,10 +1309,14 @@
                 loadConversations();
             });
             
+            // Panggil update link banner saat pertama kali load
             showPage('home-page');
-            updateSettingsPage();
+            updateSettingsPage(); 
             updateStatsPanel();
-        }
+            updateTelegramBannerLink(); // Panggil update link saat load awal
+
+        } // Akhir dari else if (!isExpiredOrFrozen)
+        
     </script>
 </body>
 </html>
